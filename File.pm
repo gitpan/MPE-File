@@ -14,6 +14,7 @@ mpefopen openfile readrec writerec hpfopen hperrmsg fread ccode
 fcheck fwrite fclose flock funlock fpoint fcontrol fdelete ferrmsg
 printfileinfo iowait iodontwait flabelinfo $MPE_error freadlabel
 fwritelabel mpe_fileno lastwaitfilenum mpeprint printop printopreply
+@itemerror
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -21,7 +22,7 @@ our @EXPORT = qw(
   $MPE_error flabelinfo lastwaitfilenum iowait iodontwait
   printop printopreply mpeprint
 );
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 our @flabeltypes = qw( x
   A8 A8 A8 A8    L S S S s S
   S l S s s      s s s L L
@@ -45,6 +46,8 @@ our @ffileinfotypes = qw( x
   q l L l l l l l l l
   l l l l l l l l q l
 );
+
+our @itemerror;
 
 sub new {
   my $class = shift;
@@ -101,10 +104,10 @@ sub flabelinfo {
    my $unpack = "";
    my @itemsin;
    my $items;
-   my $itemerror;
    my @quaditems;
    my @pathitems;
    my $fserr = 0;
+   my $itemerror;
    my $itemnum;
    my $name = shift;
    my $mode = shift;
@@ -135,8 +138,11 @@ sub flabelinfo {
    $itemerror = "\0\0" x scalar(@itemsin);
    push @itemsin, 0;
    $items = pack "s*", @itemsin;
-   mpeflabelinfo($name, $mode, $items, $itemsout, $itemerror)
-     or return undef;
+   @itemerror = ();
+   if (!mpeflabelinfo($name, $mode, $items, $itemsout, $itemerror)) {
+     @itemerror = unpack "s*", $itemerror;
+     return ();
+   }
 
    my @arrayout = unpack $unpack, $itemsout;
 
@@ -271,6 +277,8 @@ MPE::File - Perl extension for accessing MPE File intrinsics
   @info = $file->ffileinfo(1, 3, 7, 9);
 
   @info = flabelinfo("FRED.PUB", $mode, 1, 3, 7, 9);
+    If there is an error, an empty list is returned and you can check
+    $MPE_error and @MPE::File::itemerror for the error
 
   $errmsg = ferrmsg($fserrcode);
   hperrmsg($displaycode,...)
@@ -282,9 +290,16 @@ MPE::File - Perl extension for accessing MPE File intrinsics
 
   Notice that there are some difference in parameters.
   For example, I take care of all the delimited strings in HPFOPEN
+
   Subroutines return 0 or undef on failure; check $MPE_error for
   the error number and/or string (both should be valid).
-
+  For example:
+    if ($MPE_error == 52) {
+      print 0+$MPE_error, " ", $MPE_error, "\n";
+    }
+  Will print
+   52 NONEXISTENT PERMANENT FILE  (FSERR 52)
+  (if that is the error).
 
   MPE::File->new($x) is the same as MPE::File->hpfopen(52, $x)
   which, to quote the Intrinsic manual:

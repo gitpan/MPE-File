@@ -14,3 +14,10 @@ Revision history for Perl extension MPE::File
 	added mpeprint(), printop, printopreply functions
         - changed writerec and fcontrol so that constants
           can be passed where appropriate
+
+0.05  Wed Dec 18 2002
+	Fixed minor bug in flabelinfo
+	  return () instead of undef on error
+
+0.06  Wed Dec 18 2002
+	Make @itemerror a global variable

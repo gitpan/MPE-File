@@ -20,7 +20,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
   $MPE_error flabelinfo
 );
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @flabeltypes = qw( x
   A8 A8 A8 A8    L S S S s S
   S l S s s      s s s L L

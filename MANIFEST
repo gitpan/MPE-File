@@ -7,4 +7,5 @@ Makefile.PL
 README
 longptr.h
 mpefile.h
-test.pl
+t/test1.t
+TODO

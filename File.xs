@@ -787,7 +787,8 @@ fgetkeyinfo(filenum, param, control)
       SvPV_force(param, dummylen);
       SvGROW(param, 162);
       SvPV_force(control, dummylen);
-      SvGROW(control, 162);
+      SvGROW(control, 256);
+      FGETKEYINFO(filenum, SvPVX(param), SvPVX(control));
      RETVAL = (ccode() == CCE);
      if (!RETVAL) {
        short shorterr;

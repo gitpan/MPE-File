@@ -1,4 +1,4 @@
-BEGIN { $| = 1; print "1..31\n"; }
+BEGIN { $| = 1; print "1..33\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use MPE::File;
 $loaded = 1;
@@ -115,3 +115,12 @@ ok (scalar(@path) == 1)
   or print "\@path = ", join(' ', @path), "\n";
 
 ok($file->fclose(4,0));
+
+my $testconst = MPE::File->new("./testwrite,new;del;acc=update")
+  or die ("Cannot open testwrite: $MPE_error");
+
+$testconst->writerec("Hello there");
+ok(1); #i.e. The last test did not abort the program
+
+$testconst->fcontrol(2, 1);
+ok(1); #i.e. The last test did not abort the program

@@ -353,15 +353,16 @@ writerec(filenum, buffer, ...)
   {
      short cctl=0;
      int reclen;
+     char *bufptr;
      if (items>2)
          cctl=SvIV(ST(2));
-     SvPV_force(buffer, reclen);
+     bufptr = SvPV(buffer, reclen);
      if (reclen > 32767) {
        reclen /= 2;
      } else {
        reclen = -reclen;
      }
-     FWRITE(filenum, longaddr(SvPVX(buffer)), (short)reclen, cctl);
+     FWRITE(filenum, longaddr(bufptr), (short)reclen, cctl);
      RETVAL = (ccode() == CCE);
      if (!RETVAL) {
        short shorterr;
@@ -520,6 +521,91 @@ fwrite(filenum, buffer, length, controlcode)
   OUTPUT:
        RETVAL
 
+
+int
+mpeprint(buffer, ...)
+    SV  *buffer
+  PROTOTYPE: $;$$
+  CODE:
+    int length;
+    short cctl=0;
+    char *bufptr=SvPV(buffer, length);
+
+    if (items>1 && SvIOK(ST(1))) {
+      length=SvIV(ST(1));
+    } else {
+      length = -length;
+    }
+    if (items>2 && SvIOK(ST(2))) {
+      cctl=SvIV(ST(2));
+    }
+    PRINT(longaddr(bufptr), (short)length, cctl);
+    RETVAL = (ccode() == CCE);
+    if (!RETVAL) {
+       short shorterr;
+       FCHECK(0, &shorterr,0,0,0);
+       seterrmpe(shorterr);
+    }
+  OUTPUT:
+       RETVAL
+
+
+SV *
+printopreply (buffer)
+    SV  *buffer
+  PROTOTYPE: $
+  CODE: 
+  {
+    int length;
+    char *bufptr=SvPV(buffer, length);
+    char reply[32];
+    short lenread;
+
+    memset(reply, 0, sizeof reply);
+
+    lenread=PRINTOPREPLY(bufptr, -(short)length, 0, reply, 31);
+    if (ccode() != CCE) {
+       short shorterr;
+       FCHECK(0, &shorterr,0,0,0);
+       seterrmpe(shorterr);
+	RETVAL = &PL_sv_undef;
+    } else {
+      reply[lenread] = '\0';
+      RETVAL = newSVpvn(reply, lenread);
+    }
+  }
+  OUTPUT:
+    RETVAL
+
+int
+printop(buffer, ...)
+    SV  *buffer
+  PROTOTYPE: $;$$
+  CODE:
+    int length;
+    short cctl=0;
+    char *bufptr=SvPV(buffer, length);
+
+    if (items>1 && SvIOK(ST(1))) {
+      length=SvIV(ST(1));
+    } else {
+      length = -length;
+    }
+    if (items>2 && SvIOK(ST(2))) {
+      cctl=SvIV(ST(2));
+    }
+    PRINTOP(bufptr, (short)length, cctl);
+    RETVAL = (ccode() == CCE);
+    if (!RETVAL) {
+       short shorterr;
+       FCHECK(0, &shorterr,0,0,0);
+       seterrmpe(shorterr);
+    }
+  OUTPUT:
+       RETVAL
+
+
+
 int
 fclose(filenum, disposition, securitycode)
     short filenum = SvIV(SvROK($arg)?SvRV($arg):$arg);
@@ -602,7 +688,8 @@ fcontrol(filenum,itemnum,item)
        FCHECK(filenum, &shorterr,0,0,0);
        seterrmpe(shorterr);
     }
-    sv_setiv(item, sitem);
+    if (sitem != SvIV(item))
+      sv_setiv(item, sitem);
   }
   OUTPUT:
     RETVAL

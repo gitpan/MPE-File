@@ -222,6 +222,14 @@ extern void FLABELINFO(char    *parm1,
 extern void PRINT(longpointer parm1,
                   short    parm2,
                   short    parm3 );
+extern void PRINTOP(char *parm1,
+                  short    parm2,
+                  short     parm3 );
+extern short PRINTOPREPLY(char    *parm1,
+                          short    parm2,
+                          short    parm3,
+                          char    *parm4,
+                          short    parm5 );
 extern void PRINTFILEINFO(short    parm1 );
 extern short READX(longpointer parm1,
                    short    parm2 );

@@ -13,14 +13,15 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 mpefopen openfile readrec writerec hpfopen hperrmsg fread ccode
 fcheck fwrite fclose flock funlock fpoint fcontrol fdelete ferrmsg
 printfileinfo iowait iodontwait flabelinfo $MPE_error freadlabel
-fwritelabel mpe_fileno lastwaitfilenum
+fwritelabel mpe_fileno lastwaitfilenum mpeprint printop printopreply
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
-  $MPE_error flabelinfo
+  $MPE_error flabelinfo lastwaitfilenum iowait iodontwait
+  printop printopreply mpeprint
 );
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @flabeltypes = qw( x
   A8 A8 A8 A8    L S S S s S
   S l S s s      s s s L L
@@ -77,6 +78,19 @@ sub hpfopen {
     return undef;
   }
   return \$self;
+}
+
+sub print {
+  my $self = shift;
+  my $sep = defined($,)?$,:'';
+  my $eol = defined($\)?$\:'';
+  $self->writerec(join($sep , @_) . $eol);
+}
+
+sub printf {
+  my $self = shift;
+  my $fmt = shift;
+  $self->writerec(sprintf $fmt, @_);
 }
 
 
@@ -218,6 +232,12 @@ MPE::File - Perl extension for accessing MPE File intrinsics
 
 
   $file->writerec($buffer, [$controlcode] )   # use this instead of fwrite
+  # (do not include '\n' at end of rec)
+
+  $file->print($a, $b, $c);
+  $file->printf($fmt, $a, $b, $c);
+  # (do not include '\n' at end of rec)
+ 
 
   $file->fupdate($buffer);
   $file->fwritedir($buffer, $lrecnum);
@@ -232,6 +252,21 @@ MPE::File - Perl extension for accessing MPE File intrinsics
   $file->fgetkeyinfo($param, $control);
   $file->ffindbykey($value, $location, $length, $relop);
   $file->printfileinfo();
+
+  $rec = $file->iowait();
+    or
+  $rec =iowait(0);
+   then call lastwaitfilenum() to get file number
+
+  $rec->mpe_fileno
+    You'll need this to compare with lastwaitfilenum()
+
+  mpeprint("rec");
+    Calls MPE intrinsic PRINT()
+    (Perl print does not work right if stdout is circular file, msg file, ...)
+
+  printop($msg);
+  $rec = printopreply($msg);
 
   @info = $file->ffileinfo(1, 3, 7, 9);
 

@@ -1,1 +1,5 @@
-iowait, iodontwait do not work
+FFINDBYKEY and FREADBYKEY should convert keys automatically.
+
+There are all sorts of intrinsics that could be added.
+
+E.g. it would be useful to have the HPDATE* intrinsics.

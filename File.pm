@@ -13,14 +13,14 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 mpefopen openfile readrec writerec hpfopen hperrmsg fread ccode
 fcheck fwrite fclose flock funlock fpoint fcontrol fdelete ferrmsg
 printfileinfo iowait iodontwait flabelinfo $MPE_error freadlabel
-fwritelabel
+fwritelabel mpe_fileno lastwaitfilenum
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
   $MPE_error flabelinfo
 );
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @flabeltypes = qw( x
   A8 A8 A8 A8    L S S S s S
   S l S s s      s s s L L

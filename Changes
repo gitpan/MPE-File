@@ -5,3 +5,5 @@ Revision history for Perl extension MPE::File
 		-A -n MPE::File
 0.02  Wed Dec 19 2001
 	- fixed fgetkeyinfo
+0.02  Wed Jan 21 2002
+	- fixed iowait, added mpe_fileno, lastwaitfilenum

@@ -316,6 +316,14 @@ mpeflabelinfo(name, mode, items, itemsout, itemerror)
      RETVAL
 
 
+int
+mpe_fileno(filenum)
+    short filenum = SvIV(SvROK($arg)?SvRV($arg):$arg);
+  CODE:
+    RETVAL = filenum;
+  OUTPUT:
+    RETVAL
+
 SV *
 readrec(filenum)
     short filenum = SvIV(SvROK($arg)?SvRV($arg):$arg);
@@ -653,6 +661,7 @@ printfileinfo(filenum)
   CODE:
     PRINTFILEINFO(filenum);
 
+
 SV *
 iowait(filenum)
     short filenum = SvIV(SvROK($arg)?SvRV($arg):$arg);
@@ -676,6 +685,8 @@ iowait(filenum)
       RETVAL = &PL_sv_undef;
     }
   }
+  OUTPUT:
+    RETVAL
  
 SV *
 iodontwait(filenum)
@@ -700,6 +711,8 @@ iodontwait(filenum)
       RETVAL = &PL_sv_undef;
     }
   }
+  OUTPUT:
+    RETVAL
  
 int
 mpe_iowait(filenum,buffer,length,cstation)
@@ -978,6 +991,13 @@ freadc(filenum)
       RETVAL = &PL_sv_undef;
     }
   }
+  OUTPUT:
+    RETVAL
+
+int
+lastwaitfilenum()
+  CODE:
+    RETVAL = lastwaitfilenum;
   OUTPUT:
     RETVAL
 
